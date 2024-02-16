@@ -11,7 +11,7 @@ const currentUser = ref('');
 const router = useRouter();
 
 let tempComponent = Company;
-const curCompo = ref(AddCompany);
+const curCompo = ref(Company);
 
 function changeComponent(componentName) {
   switch (componentName) {
@@ -44,11 +44,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <component :is="curCompo"></component>
+  <!-- <component :is="curCompo"></component> -->
+
+  <Company />
 
   <v-card>
     <v-layout>
-      <v-navigation-drawer permanent location="left" expand-on-hover rail>
+      <!-- expand-on-hover rail -->
+      <v-navigation-drawer permanent location="left">
         <template v-slot:prepend>
           <v-list-item v-if="currentUser" lines="two" :prepend-avatar="currentUser.image"
             :title="currentUser.firstName + ' ' + currentUser.lastName"
