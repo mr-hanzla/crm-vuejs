@@ -1,8 +1,10 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
 import { useStore } from 'vuex';
 import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { useVuelidate } from '@vuelidate/core'
+import { email, required } from '@vuelidate/validators'
 
 const router = useRouter();
 const userStore = useStore('UserStore');
@@ -49,24 +51,65 @@ async function captureImage() {
   }
 }
 
+const hello = 'some error message';
+
+const initialState = {
+  username: '',
+  email: '',
+  password: '',
+}
+
+const state = reactive({
+  ...initialState,
+})
+
+const rules = {
+  username: { required },
+  email: { required, email },
+  select: { required },
+  items: { required },
+  checkbox: { required },
+}
+
+const v$ = useVuelidate(rules, state)
+
+function clear() {
+  v$.value.$reset()
+
+  for (const [key, value] of Object.entries(initialState)) {
+    state[key] = value
+  }
+}
+
+// to toggle visibility of password field
+const visible = ref(false);
+
 onMounted(() => {
   console.log(userStore.state.count);
 })
 </script>
 
 <template>
-  <v-sheet class="mx-auto">
-    <v-img :width="300" aspect-ratio="16/9" cover v-if="imageData" :src="imageData"></v-img>
-    <v-form @submit.prevent="signInUser">
-      <v-text-field v-model="username" label="Username" required></v-text-field>
-      <v-text-field v-model="password" label="Password" type="password" required></v-text-field>
-      <v-btn type="submit" color="primary" class="me-2">Sign In</v-btn>
+  <div class="register-company-form">
+    <v-img class="mx-auto my-6" max-width="500"
+      src="https://cdn.vuetifyjs.com/docs/images/logos/vuetify-logo-v3-slim-text-light.svg"></v-img>
 
-      <v-btn class="me-4" >Sign Up</v-btn>
-      <v-btn @click="">clear</v-btn>
-    </v-form>
-    <v-text-field>Don't have an account? </v-text-field>
-  </v-sheet>
+    <v-card class="mx-auto pa-12 pb-8" elevation="15" max-width="800" rounded="lg">
+      <v-form @submit.prevent="signInUser" width="3000">
+        <v-text-field v-model="username" clearable label="Username" placeholder="johndoe"
+          variant="outlined"></v-text-field>
+        <v-text-field v-model="password" clearable type="password" label="Password" placeholder="abc123"
+          variant="outlined"></v-text-field>
+
+        <v-btn type="submit" class="mx-auto mb-8" size="large" color="black">Sign In</v-btn>
+      </v-form>
+      <!-- <v-card-text class="text-center">
+        <a class="text-blue text-decoration-none" href="#" rel="noopener noreferrer" target="_blank">
+          Add Company <v-icon icon="mdi-chevron-right"></v-icon>
+        </a>
+      </v-card-text> -->
+    </v-card>
+  </div>
 </template>
 
 <style scoped>

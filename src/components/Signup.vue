@@ -1,5 +1,8 @@
 <script setup>
 import { ref } from 'vue';
+import { reactive } from 'vue'
+import { useVuelidate } from '@vuelidate/core'
+import { email, required } from '@vuelidate/validators'
 
 const username = ref('');
 const password = ref('');
@@ -7,10 +10,6 @@ const password = ref('');
 function signInUser() {
   console.log(username.value, password.value);
 }
-
-import { reactive } from 'vue'
-import { useVuelidate } from '@vuelidate/core'
-import { email, required } from '@vuelidate/validators'
 
 const initialState = {
   name: '',

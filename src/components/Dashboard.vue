@@ -1,19 +1,73 @@
 <script setup>
-import { onMounted } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
+import Company from '@/components/Company.vue';
+import AddCompany from '@/components/AddCompany.vue';
+
+const userStore = useStore('UserStore');
+const currentUser = ref('');
 const router = useRouter();
 
+let tempComponent = Company;
+const curCompo = ref(AddCompany);
+
+function changeComponent(componentName) {
+  switch (componentName) {
+    case "company-data":
+      tempComponent = Company;
+      break;
+    case "register-company":
+      tempComponent = AddCompany;
+      break;
+    default:
+      break;
+  }
+}
+
+function signout() {
+  console.log('signing out...');
+  userStore.dispatch('signout');
+}
+
 onMounted(() => {
-  const curUser = localStorage.getItem('current-user');
-  if (!curUser) {
-    router.push({ name: 'signin' })
+  // currentUser.value = localStorage.getItem('current-user');
+  currentUser.value = userStore.getters.getUser;
+  console.log('CurrenUser: ', currentUser.value)
+  console.log('CurrenUser: ', currentUser)
+  if (!currentUser.value) {
+    console.log('in da if')
+    // router.push({ name: 'signin' })
   }
 })
 </script>
 
 <template>
-  <h1>Dashboard</h1>
+  <component :is="curCompo"></component>
+
+  <v-card>
+    <v-layout>
+      <v-navigation-drawer permanent location="left" expand-on-hover rail>
+        <template v-slot:prepend>
+          <v-list-item v-if="currentUser" lines="two" :prepend-avatar="currentUser.image"
+            :title="currentUser.firstName + ' ' + currentUser.lastName"
+            :subtitle="currentUser ? 'Signed In' : 'Signed Out'"></v-list-item>
+        </template>
+
+        <v-divider></v-divider>
+        <v-divider></v-divider>
+
+        <v-list density="compact" nav>
+          <v-list-item @click="curCompo = Company" prepend-icon="mdi-home-city" title="Company Data" value="company"></v-list-item>
+          <v-list-item @click="curCompo = AddCompany" prepend-icon="mdi-home-city" title="Add New Company" value="reg-company"></v-list-item>
+          <v-list-item v-if="currentUser" @click="signout" prepend-icon="mdi-account" title="Sign Out" value="signout"></v-list-item>
+          <v-list-item v-else @click="router.push({name: 'signin'})" prepend-icon="mdi-account" title="Sign In" value="signin"></v-list-item>
+        </v-list>
+      </v-navigation-drawer>
+      <v-main style="height: 10%"></v-main>
+    </v-layout>
+  </v-card>
 </template>
 
 <style scoped></style>
