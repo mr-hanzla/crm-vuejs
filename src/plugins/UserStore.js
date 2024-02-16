@@ -66,6 +66,14 @@ const userStore = createStore({
   },
 
   getters: {
+    getUser(state) {
+      console.log('GetUser is called!');
+      if (state.user) {
+        return state.user
+      }
+      const curUser = localStorage.getItem('current-user');
+      return curUser;
+    }
   }
 })
 
