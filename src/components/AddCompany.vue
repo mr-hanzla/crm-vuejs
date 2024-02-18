@@ -8,28 +8,35 @@ const companyDescription = ref('');
 
 function addCompany() {
   const companyData = {
-    companyName: companyName.value,
-    companyUrl: companyUrl.value,
-    companyLogoUrl: companyLogoUrl.value,
-    companyDescription: companyDescription.value,
+    name: companyName.value,
+    url: companyUrl.value,
+    logoUrl: companyLogoUrl.value,
+    description: companyDescription.value,
   }
-  
+
   let companyList = JSON.parse(localStorage.getItem('companyList'));
   if (!companyList) {
     companyList = []
   }
   companyList.push(companyData);
 
-  console.log(JSON.stringify(companyData));
   localStorage.setItem('companyList', JSON.stringify(companyList));
-  localStorage.setItem('temp', JSON.stringify(companyData));
+  console.log('Company is added!');
+  resetValues();
+}
+
+function resetValues() {
+  companyName.value = '';
+  companyUrl.value = '';
+  companyLogoUrl.value = '';
+  companyDescription.value = '';
 }
 </script>
 
 <template>
   <div class="register-company-form">
-    <v-img class="mx-auto my-6" max-width="500"
-      src="https://cdn.vuetifyjs.com/docs/images/logos/vuetify-logo-v3-slim-text-light.svg"></v-img>
+    <!-- <v-img class="mx-auto my-6" max-width="500"
+      src="https://cdn.vuetifyjs.com/docs/images/logos/vuetify-logo-v3-slim-text-light.svg"></v-img> -->
 
     <v-card class="mx-auto pa-12 pb-8" elevation="15" max-width="800" rounded="lg">
       <v-text-field v-model="companyName" clearable label="Company Name" placeholder="Sample Name"
@@ -56,4 +63,5 @@ function addCompany() {
 /* .register-comapny-form {
   border: 4px solid red;
   margin-bottom: 50%;
-} */</style>
+} */
+</style>
