@@ -109,26 +109,28 @@ function addCompany() {
       console.log('Invalid Company Data Values!')
     }
   }
-  // const maxId = JSON.parse(localStorage.getItem('max-id'));
-  // company.id = maxId ? maxId + 1 : 1;
-  // if (isCompanyDataValid()) {
-  //   let companyList = JSON.parse(localStorage.getItem('company-list'));
-  //   if (!companyList) {
-  //     companyList = []
-  //   }
-  //   companyList.push(company);
+  else {
+    const maxId = JSON.parse(localStorage.getItem('max-id'));
+    company.id = maxId ? maxId + 1 : 1;
+    if (isCompanyDataValid()) {
+      let companyList = JSON.parse(localStorage.getItem('company-list'));
+      if (!companyList) {
+        companyList = []
+      }
+      companyList.push(company);
 
-  //   localStorage.setItem('company-list', JSON.stringify(companyList.value));
-  //   localStorage.setItem('max-id', company.id);
-  //   console.log('Company is added!');
-  //   resetValues();
-  // } else {
-  //   console.log('Invalid Company Data Values!')
-  // }
+      localStorage.setItem('company-list', JSON.stringify(companyList.value));
+      localStorage.setItem('max-id', company.id);
+      console.log('Company is added!');
+      resetValues();
+    } else {
+      console.log('Invalid Company Data Values!')
+    }
+  }
 }
 
 function editCompany(tempCompany) {
-  selectedCompany = {...tempCompany}
+  selectedCompany = { ...tempCompany }
   // console.log('selectedCompany: ', selectedCompany)
   setCompanyValues(tempCompany.id, tempCompany.name, tempCompany.url, tempCompany.logoUrl, tempCompany.description);
   console.log('company: ', company)
