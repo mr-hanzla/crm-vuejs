@@ -2,7 +2,7 @@
 import { ref, reactive, onMounted } from 'vue';
 import AddCompany from './AddCompany.vue';
 
-const companyList = ref(JSON.parse(localStorage.getItem('companyList')));
+const companyList = ref(JSON.parse(localStorage.getItem('company-list')));
 
 const dialog = ref(false);
 // const headers = [
@@ -64,7 +64,10 @@ const company = reactive({
   description: 'This is some same description'
 })
 
-function setCompanyValues(name, url, logoUrl, description) {
+let selectedCompany = null;
+
+function setCompanyValues(id, name, url, logoUrl, description) {
+  company.id = id
   company.name = name;
   company.url = url;
   company.logoUrl = logoUrl;
@@ -72,7 +75,8 @@ function setCompanyValues(name, url, logoUrl, description) {
 }
 
 function resetValues() {
-  setCompanyValues('', '', '', '');
+  selectedCompany = null;
+  setCompanyValues(null, '', '', '', '');
 }
 
 function isCompanyDataValid() {
@@ -85,35 +89,55 @@ function isCompanyDataValid() {
 
 function addCompany() {
   console.log(company);
-  const maxId = JSON.parse(localStorage.getItem('max-id'));
-  company.id = maxId ? maxId + 1 : 1;
-  if (isCompanyDataValid()) {
-    let companyList = JSON.parse(localStorage.getItem('companyList'));
-    if (!companyList) {
-      companyList = []
-    }
-    companyList.push(company);
+  // if there is a company to edit
+  if (company.id) {
+    if (isCompanyDataValid()) {
+      updateCompanyList();
 
-    localStorage.setItem('companyList', JSON.stringify(companyList));
-    localStorage.setItem('max-id', company.id);
-    console.log('Company is added!');
-    resetValues();
-  } else {
-    console.log('Invalid Company Data Values!')
+      companyList.value.forEach(comp => {
+        if (comp.id === company.id) {
+          comp.name = company.name;
+          comp.url = company.url;
+          comp.logoUrl = company.logoUrl;
+          comp.description = company.description;
+        }
+      })
+
+      localStorage.setItem('company-list', JSON.stringify(companyList.value));
+      resetValues();
+    } else {
+      console.log('Invalid Company Data Values!')
+    }
   }
+  // const maxId = JSON.parse(localStorage.getItem('max-id'));
+  // company.id = maxId ? maxId + 1 : 1;
+  // if (isCompanyDataValid()) {
+  //   let companyList = JSON.parse(localStorage.getItem('company-list'));
+  //   if (!companyList) {
+  //     companyList = []
+  //   }
+  //   companyList.push(company);
+
+  //   localStorage.setItem('company-list', JSON.stringify(companyList.value));
+  //   localStorage.setItem('max-id', company.id);
+  //   console.log('Company is added!');
+  //   resetValues();
+  // } else {
+  //   console.log('Invalid Company Data Values!')
+  // }
 }
 
 function editCompany(tempCompany) {
-  setCompanyValues(tempCompany.name, tempCompany.url, tempCompany.logoUrl, tempCompany.description);
-  console.log(tempCompany);
+  selectedCompany = {...tempCompany}
+  // console.log('selectedCompany: ', selectedCompany)
+  setCompanyValues(tempCompany.id, tempCompany.name, tempCompany.url, tempCompany.logoUrl, tempCompany.description);
+  console.log('company: ', company)
   dialog.value = true;
-
-  const tempList = JSON.parse(localStorage.getItem('companyList'));
 }
 
 function deleteCompany(company) {
   companyList.value = companyList.value.filter(_company => _company !== company);
-  localStorage.setItem('companyList', JSON.stringify(companyList.value));
+  localStorage.setItem('company-list', JSON.stringify(companyList.value));
 }
 
 function openModal() {
@@ -121,8 +145,13 @@ function openModal() {
   dialog.value = true;
 }
 
+function updateCompanyList() {
+  companyList.value = JSON.parse(localStorage.getItem('company-list'));
+}
+
 onMounted(() => {
-  companyList.value = JSON.parse(localStorage.getItem('companyList'));
+  // addSampleData();
+  updateCompanyList();
 })
 </script>
 
