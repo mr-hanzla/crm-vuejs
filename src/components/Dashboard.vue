@@ -46,7 +46,7 @@ onMounted(() => {
 <template>
   <!-- <component :is="curCompo"></component> -->
 
-  <Company />
+  <Company/>
 
   <v-card>
     <v-layout>
