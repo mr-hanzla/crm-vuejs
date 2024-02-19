@@ -27,28 +27,32 @@ function addSampleData() {
       name: 'Programmers Force',
       url: 'https://www.pf.com',
       logoUrl: 'https://www.pf.com/logo.png',
-      description: 'Located in the business hub of Lahore, providing IT services across the globe.'
+      description: 'Located in the business hub of Lahore, providing IT services across the globe.',
+      departments: ['Admin', 'Sales'],
     },
     {
       id: 2,
       name: 'Tanbits',
       url: 'https://www.tanbits.com',
       logoUrl: 'https://www.tanbits.com/logo.png',
-      description: 'Another IT service providing company, located in Johar Town.'
+      description: 'Another IT service providing company, located in Johar Town.',
+      departments: ['Admin', 'Sales'],
     },
     {
       id: 3,
       name: 'Nisum',
       url: 'https://www.nisum.com',
       logoUrl: 'https://www.nisum.com/logo.png',
-      description: 'Very ambigious company, with no explaination of what exactly they do.'
+      description: 'Very ambigious company, with no explaination of what exactly they do.',
+      departments: ['Admin', 'Sales'],
     },
     {
       id: 4,
       name: 'NextBridge',
       url: 'https://www.nextbridge.com',
       logoUrl: 'https://www.nextbridge.com/logo.png',
-      description: 'Spreading like a virus, with everyone wondering \'HOW THE HELL ARE THEY GETTING PROJECTS?\', they are providing good IT services, apparently!'
+      description: 'Spreading in Lahore, and providing good IT services, apparently!',
+      departments: ['Admin', 'Sales'],
     },
   ]
 
@@ -56,27 +60,43 @@ function addSampleData() {
   console.log('Sample Company Data is added!');
 }
 
+const availableDepartments = reactive([]);
+
+const temp = JSON.parse(localStorage.getItem('departments'));
+
+function setDepartments() {
+  const tempDeps = JSON.parse(localStorage.getItem('departments'))
+  if (tempDeps) {
+    availableDepartments.push(...tempDeps.map(dep => dep.name));
+    console.log('Deps: ', availableDepartments)
+    console.log('b', tempDeps);
+  }
+}
+
+
 const company = reactive({
   id: null,
-  name: 'Some sample name!',
-  url: 'googoo.com',
-  logoUrl: 'hotlo.com/logo.png',
-  description: 'This is some same description'
+  name: '',
+  url: '',
+  logoUrl: '',
+  description: '',
+  departments: [],
 })
 
 let selectedCompany = null;
 
-function setCompanyValues(id, name, url, logoUrl, description) {
+function setCompanyValues(id, name, url, logoUrl, description, departments) {
   company.id = id
   company.name = name;
   company.url = url;
   company.logoUrl = logoUrl;
   company.description = description;
+  company.departments = departments;
 }
 
 function resetValues() {
   selectedCompany = null;
-  setCompanyValues(null, '', '', '', '');
+  setCompanyValues(null, '', '', '', '', []);
 }
 
 function isCompanyDataValid() {
@@ -89,6 +109,7 @@ function isCompanyDataValid() {
 
 function addCompany() {
   console.log(company);
+  // return; // uncomment to stop execution of the below code
   // if there is a company to edit
   if (company.id) {
     if (isCompanyDataValid()) {
@@ -100,11 +121,13 @@ function addCompany() {
           comp.url = company.url;
           comp.logoUrl = company.logoUrl;
           comp.description = company.description;
+          comp.departments = company.departments;
         }
       })
 
       localStorage.setItem('company-list', JSON.stringify(companyList.value));
       resetValues();
+      dialog.value = false;
     } else {
       console.log('Invalid Company Data Values!')
     }
@@ -123,6 +146,7 @@ function addCompany() {
       localStorage.setItem('max-id', company.id);
       console.log('Company is added!');
       resetValues();
+      dialog.value = false;
     } else {
       console.log('Invalid Company Data Values!')
     }
@@ -131,9 +155,8 @@ function addCompany() {
 
 function editCompany(tempCompany) {
   selectedCompany = { ...tempCompany }
-  // console.log('selectedCompany: ', selectedCompany)
-  setCompanyValues(tempCompany.id, tempCompany.name, tempCompany.url, tempCompany.logoUrl, tempCompany.description);
-  console.log('company: ', company)
+  setCompanyValues(tempCompany.id, tempCompany.name, tempCompany.url, tempCompany.logoUrl, tempCompany.description, tempCompany.departments);
+  // console.log('company: ', company);
   dialog.value = true;
 }
 
@@ -153,6 +176,7 @@ function updateCompanyList() {
 
 onMounted(() => {
   // addSampleData();
+  setDepartments();
   updateCompanyList();
 })
 </script>
@@ -165,8 +189,9 @@ onMounted(() => {
         <tr>
           <th class="text-left"><b>Name</b></th>
           <th class="text-left"><b>URL</b></th>
-          <th class="text-left"><b>Logo URL</b></th>
+          <!-- <th class="text-left"><b>Logo URL</b></th> -->
           <th class="text-left"><b>Description</b></th>
+          <th class="text-left"><b>Departments</b></th>
           <th class="text-center" colspan="3"><b>Action</b></th>
           <!-- <th class="text-left"><b>Action</b></th>
           <th class="text-left"><b>Action</b></th> -->
@@ -175,9 +200,10 @@ onMounted(() => {
       <tbody>
         <tr v-for="company in companyList" :key="company.name">
           <td>{{ company.name }}</td>
-          <td>{{ company.url }}</td>
-          <td>{{ company.logoUrl }}</td>
+          <td><a target="_blank" :href="company.url">{{ company.url }}</a></td>
+          <!-- <td>{{ company.logoUrl }}</td> -->
           <td>{{ company.description }}</td>
+          <td>{{ company.departments.join(', ') }}</td>
           <td><v-btn @click="editCompany(company)" color="primary">Edit</v-btn></td>
           <td><v-btn @click="deleteCompany(company)" color="error">Delete</v-btn></td>
         </tr>
@@ -185,6 +211,7 @@ onMounted(() => {
     </v-data-table>
   </div>
 
+  <!-- Add New Company - Modal -->
   <div class="text-center">
     <v-dialog v-model="dialog" width="800">
       <!-- Having a component as a modal is one of the way to do it -->
@@ -199,6 +226,9 @@ onMounted(() => {
 
         <v-textarea v-model="company.description" clearable label="Description" placeholder="Tell about the company"
           variant="outlined"></v-textarea>
+
+        <v-select v-model="company.departments" label="Select Department(s)" :items="availableDepartments" multiple
+          variant="outlined"></v-select>
 
         <v-btn @click="addCompany" class="mx-auto mb-8" size="large" color="black">Add Company</v-btn>
         <v-card-actions>
