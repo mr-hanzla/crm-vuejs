@@ -62,8 +62,8 @@ onMounted(() => {
         <v-divider></v-divider>
 
         <v-list density="compact" nav>
-          <v-list-item @click="curCompo = Company" prepend-icon="mdi-home-city" title="Company Data" value="company"></v-list-item>
-          <v-list-item @click="curCompo = AddCompany" prepend-icon="mdi-home-city" title="Add New Company" value="reg-company"></v-list-item>
+          <v-list-item @click="curCompo = Company" prepend-icon="mdi-home-city" title="Companies" value="companies"></v-list-item>
+          <v-list-item @click="curCompo = Company" prepend-icon="mdi-home-city" title="Departments" value="departments"></v-list-item>
           <v-list-item v-if="currentUser" @click="signout" prepend-icon="mdi-account" title="Sign Out" value="signout"></v-list-item>
           <v-list-item v-else @click="router.push({name: 'signin'})" prepend-icon="mdi-account" title="Sign In" value="signin"></v-list-item>
         </v-list>
