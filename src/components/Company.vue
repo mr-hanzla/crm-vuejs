@@ -1,24 +1,11 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import AddCompany from './AddCompany.vue';
+import { compileScript } from 'vue/compiler-sfc';
 
 const companyList = ref(JSON.parse(localStorage.getItem('company-list')));
 
 const dialog = ref(false);
-// const headers = [
-//   { title: 'Name', value: 'name' },
-//   { title: 'Url', value: 'url' },
-//   { title: 'Logo Url', value: 'logoUrl' },
-//   { title: 'Description', value: 'description' },
-//   {
-//     title: 'Actions',
-//     align: 'center',
-//     children: [
-//       // { title: 'Edit', value: 'eidt' },
-//       // { title: 'Delete', value: 'Delete' },
-//     ],
-//   },
-// ]
 
 function addSampleData() {
   const tempList = [
@@ -52,7 +39,23 @@ function addSampleData() {
       url: 'https://www.nextbridge.com',
       logoUrl: 'https://www.nextbridge.com/logo.png',
       description: 'Spreading in Lahore, and providing good IT services, apparently!',
-      departments: ['Admin', 'Sales'],
+      departments: ['Admin', 'Marketing'],
+    },
+    {
+      id: 5,
+      name: 'ArhamSoft',
+      url: 'https://www.arhamsoft.com',
+      logoUrl: 'https://www.arhamsoft.com/logo.png',
+      description: 'Having a red colored theme building, providing IT services around the globe.',
+      departments: ['Admin', 'Sales', 'HR'],
+    },
+    {
+      id: 6,
+      name: 'Netsol',
+      url: 'https://www.netsol.com',
+      logoUrl: 'https://www.netsol.com/logo.png',
+      description: 'Pakistan\'s first IT company to provide IPOs.',
+      departments: ['Admin', 'Sales', 'HR'],
     },
   ]
 
@@ -141,8 +144,7 @@ function addCompany() {
         companyList = []
       }
       companyList.push(company);
-
-      localStorage.setItem('company-list', JSON.stringify(companyList.value));
+      localStorage.setItem('company-list', JSON.stringify(companyList));
       localStorage.setItem('max-id', company.id);
       console.log('Company is added!');
       resetValues();
@@ -171,7 +173,16 @@ function openModal() {
 }
 
 function updateCompanyList() {
-  companyList.value = JSON.parse(localStorage.getItem('company-list'));
+  const companies = JSON.parse(localStorage.getItem('company-list'));
+  const curUser = JSON.parse(localStorage.getItem('current-user'));
+  if (curUser) {
+    if (curUser.role === 'superuser') {
+      companyList.value = companies;
+    } else {
+      companyList.value = companies.filter(company => curUser.companies.includes(company.id))
+    }
+  }
+  // companyList.value = []
 }
 
 onMounted(() => {
