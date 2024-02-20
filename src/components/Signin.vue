@@ -23,12 +23,26 @@ async function signInUser() {
   }
   console.log('Form data to be submitted:', ...formData);
 
-  const signinSuccess = await userStore.dispatch('signin', { username: username.value, password: password.value });
-  if (signinSuccess) {
-    username.value = '';
-    password.value = '';
-    router.push({ name: 'home' });
+
+  // to authenticate using the localStorage
+  const users = JSON.parse(localStorage.getItem('users'));
+  if (users) {
+    const currentUser = users.find(user => user.username === username.value && user.password === password.value);
+    if (currentUser) {
+      localStorage.setItem('current-user', JSON.stringify(currentUser))
+      router.push({ name: 'home' });
+    } else {
+      console.log('Invalid Username Or Password!')
+    }
   }
+
+  // to authenticate using the API
+  // const signinSuccess = await userStore.dispatch('signin', { username: username.value, password: password.value });
+  // if (signinSuccess) {
+  //   username.value = '';
+  //   password.value = '';
+  //   router.push({ name: 'home' });
+  // }
 
   // console.log(username.value, password.value);
   // console.log('Form submitted with image data:', typeof imageData.value);
