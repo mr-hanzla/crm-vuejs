@@ -5,6 +5,7 @@ import { useStore } from 'vuex';
 
 import Company from '@/components/Company.vue';
 import AddCompany from '@/components/AddCompany.vue';
+import Departments from './Departments.vue';
 
 const userStore = useStore('UserStore');
 const currentUser = ref('');
@@ -28,14 +29,14 @@ function changeComponent(componentName) {
 
 function signout() {
   console.log('signing out...');
-  userStore.dispatch('signout');
+  // userStore.dispatch('signout');
+  localStorage.removeItem('current-user');
+  router.push({ name: 'signin' });
 }
 
 onMounted(() => {
-  // currentUser.value = localStorage.getItem('current-user');
-  currentUser.value = userStore.getters.getUser;
-  console.log('CurrenUser: ', currentUser.value)
-  console.log('CurrenUser: ', currentUser)
+  currentUser.value = JSON.parse(localStorage.getItem('current-user'));
+  // currentUser.value = userStore.getters.getUser;
   if (!currentUser.value) {
     console.log('in da if')
     // router.push({ name: 'signin' })
@@ -44,17 +45,18 @@ onMounted(() => {
 </script>
 
 <template>
-  <!-- <component :is="curCompo"></component> -->
+  <component :is="curCompo"></component>
 
-  <Company/>
+  <!-- <Company/>
+  <Departments /> -->
 
   <v-card>
     <v-layout>
       <!-- expand-on-hover rail -->
       <v-navigation-drawer permanent location="left">
         <template v-slot:prepend>
-          <v-list-item v-if="currentUser" lines="two" :prepend-avatar="currentUser.image"
-            :title="currentUser.firstName + ' ' + currentUser.lastName"
+          <v-list-item v-if="currentUser" lines="two" :prepend-avatar="'https://robohash.org/Maurine.png?set=set4'"
+            :title="currentUser.username.toUpperCase()"
             :subtitle="currentUser ? 'Signed In' : 'Signed Out'"></v-list-item>
         </template>
 
@@ -63,7 +65,7 @@ onMounted(() => {
 
         <v-list density="compact" nav>
           <v-list-item @click="curCompo = Company" prepend-icon="mdi-home-city" title="Companies" value="companies"></v-list-item>
-          <v-list-item @click="curCompo = Company" prepend-icon="mdi-home-city" title="Departments" value="departments"></v-list-item>
+          <v-list-item @click="curCompo = Departments" prepend-icon="mdi-home-city" title="Departments" value="departments"></v-list-item>
           <v-list-item v-if="currentUser" @click="signout" prepend-icon="mdi-account" title="Sign Out" value="signout"></v-list-item>
           <v-list-item v-else @click="router.push({name: 'signin'})" prepend-icon="mdi-account" title="Sign In" value="signin"></v-list-item>
         </v-list>
