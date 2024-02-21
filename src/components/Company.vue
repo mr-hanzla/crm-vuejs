@@ -4,8 +4,8 @@ import AddCompany from './AddCompany.vue';
 import { compileScript } from 'vue/compiler-sfc';
 
 const companyList = ref(JSON.parse(localStorage.getItem('company-list')));
-
 const dialog = ref(false);
+const curUser = ref(null);
 
 function addSampleData() {
   const tempList = [
@@ -79,11 +79,11 @@ function setDepartments() {
 
 const company = reactive({
   id: null,
-  name: '',
-  url: '',
-  logoUrl: '',
-  description: '',
-  departments: [],
+  name: 'Testing',
+  url: 'https://www.testing.com',
+  logoUrl: 'testing.com/logo.png',
+  description: 'This is a sample description',
+  departments: ['Admin', 'HR'],
 })
 
 let selectedCompany = null;
@@ -129,6 +129,7 @@ function addCompany() {
       })
 
       localStorage.setItem('company-list', JSON.stringify(companyList.value));
+      updateCompanyList();
       resetValues();
       dialog.value = false;
     } else {
@@ -146,7 +147,15 @@ function addCompany() {
       companyList.push(company);
       localStorage.setItem('company-list', JSON.stringify(companyList));
       localStorage.setItem('max-id', company.id);
+
+      updateCurrentUser();
+      if (curUser.value) {
+        curUser.value.companies.push(company.id);
+        console.log('curUser: ', curUser.value);
+        localStorage.setItem('current-user', JSON.stringify(curUser.value));
+      }
       console.log('Company is added!');
+      updateCompanyList();
       resetValues();
       dialog.value = false;
     } else {
@@ -172,14 +181,18 @@ function openModal() {
   dialog.value = true;
 }
 
+function updateCurrentUser() {
+  curUser.value = JSON.parse(localStorage.getItem('current-user'));
+}
+
 function updateCompanyList() {
   const companies = JSON.parse(localStorage.getItem('company-list'));
-  const curUser = JSON.parse(localStorage.getItem('current-user'));
-  if (curUser) {
-    if (curUser.role === 'superuser') {
+  curUser.value ? null : updateCurrentUser();
+  if (curUser.value) {
+    if (curUser.value.role === 'superuser') {
       companyList.value = companies;
     } else {
-      companyList.value = companies.filter(company => curUser.companies.includes(company.id))
+      companyList.value = companies.filter(company => curUser.value.companies.includes(company.id))
     }
   }
   // companyList.value = []
